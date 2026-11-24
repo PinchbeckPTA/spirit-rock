@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reserve the Rays Spirit Rock</title>
+<meta name="description" content="Reserve the Rays Spirit Rock at Pinchbeck Elementary. Pick a date, then pay in Membership Toolkit.">
+<!-- GitHub Pages copy of the booking page. It talks to the Apps Script web app at BOOKING_API below. -->
+<script>var BOOKING_API = 'https://script.google.com/macros/s/AKfycbyZge3g1ytDW9ow7nHUPx6JJNr3lEa2OqO_tZkxPU3gH0p_68KVB4xaON0SDGYG-lHD7w/exec';</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap">
+<style>
+/* Rays Spirit Rock booking page · Pinchbeck PTA design: navy, sky blue, sunny yellow, warm paper */
+:root{
+  --navy:#102d63; --blue:#21477f; --sky:#e6f3fc; --ice:#edf7fe; --paper:#fbfaf5; --white:#ffffff;
+  --yellow:#ffda4e; --yellow-dark:#e5b92a; --yellow-soft:#fff6d1; --yellow-line:#f1d36a;
+  --line:#dce6eb; --open-line:#bcdcf5; --muted:#4a5f78; --tile:#f1f3f4; --tile-ink:#8a96a6;
+  --booked:#e9e8f7; --booked-ink:#7d7ab0; --ok:#1c7a4a; --ok-soft:#e2f4ea; --bad:#b3261e;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--navy);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.02em;margin:0;line-height:1.1;text-wrap:balance}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.muted{color:var(--muted)}
+
+.top{display:flex;align-items:center;gap:16px;background:var(--sky);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:20px}
+.top img{width:110px;height:auto;aspect-ratio:900/641;object-fit:cover;overflow:hidden;font-size:0;border-radius:4px;background:#fff;padding:5px 5px 8px;box-shadow:0 6px 14px rgba(16,45,99,.15);transform:rotate(-3deg);flex:none}
+.top h1{font-size:clamp(1.5rem,4.5vw,2.1rem)}
+.top h1 span{background:linear-gradient(transparent 70%,var(--yellow) 70%,var(--yellow) 90%,transparent 90%)}
+.top p{margin:4px 0 0;color:var(--blue)}
+@media (max-width:480px){.top img{width:80px}}
+
+.steps{display:flex;align-items:center;gap:10px;list-style:none;padding:0;margin:0 0 18px;flex-wrap:wrap}
+.steps li{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem;color:var(--muted)}
+.steps .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#e8edf1;font-size:.8rem;font-weight:800}
+.steps li.on{color:var(--navy)} .steps li.on .n{background:var(--navy);color:var(--white)}
+.steps li.done .n{background:var(--sky);color:var(--blue)}
+.steps .bar{width:28px;height:1px;background:var(--line)}
+@media (max-width:520px){.steps .t{display:none}.steps li.on .t{display:inline}.steps .bar{width:12px}}
+
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:780px){.layout{grid-template-columns:1fr}}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px}
+.sec-title{font-size:1.5rem;margin-bottom:4px}
+.intro{margin:0 0 14px;color:var(--muted)}
+
+.calhead{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.calhead h3{font-size:1.3rem;margin-right:auto}
+.arrow{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--white);color:var(--navy);font-size:1.1rem}
+.arrow:disabled{background:var(--tile);color:#b9c2cc;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{text-align:center;font-size:.78rem;font-weight:700;color:var(--muted)}
+.day{aspect-ratio:1/1;border-radius:10px;border:1px solid transparent;background:var(--tile);color:var(--tile-ink);font-weight:700;font-size:.98rem;padding:0;min-width:0}
+.day.open{background:var(--sky);border-color:var(--open-line);color:var(--navy)}
+.day.open:hover{background:#d6ebfb}
+.day.booked{background:var(--booked);color:var(--booked-ink);text-decoration:line-through}
+.day.sel{background:var(--yellow);border-color:var(--yellow-dark);color:var(--navy);box-shadow:0 0 0 2px var(--yellow-dark) inset}
+.day:disabled{cursor:not-allowed}
+.day.blank{visibility:hidden}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.82rem;font-weight:700;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid var(--line)}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:16px;padding-top:14px;flex-wrap:wrap}
+.foot small{display:block;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:13px 20px;font-weight:800;font-size:1rem;border:1px solid transparent;text-decoration:none}
+.btn-y{background:var(--yellow);color:var(--navy);box-shadow:0 3px 0 var(--yellow-dark)}
+.btn-y:hover{background:#ffe27a}
+.btn-y:disabled{background:#efe9d6;color:#8d8670;box-shadow:none;cursor:not-allowed}
+.btn-w{background:var(--white);color:var(--navy);border-color:#cadbe9}
+.btn-sm{padding:9px 14px;font-size:.92rem}
+.actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+.chipdate{display:flex;align-items:center;gap:10px;background:var(--sky);border-radius:12px;padding:12px 14px;font-weight:800;margin-bottom:16px}
+.chipdate button{margin-left:auto;background:none;border:0;color:var(--navy);font-weight:800;text-decoration:underline;font-size:.9rem}
+label{display:block;font-weight:800;margin:0 0 6px;font-size:.95rem}
+label small{font-weight:500;color:var(--muted)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:800;background:var(--white);color:var(--navy);text-align:left;font-size:.95rem}
+.opt .dot{width:16px;height:16px;border-radius:50%;border:2px solid #9fb2c6;flex:none}
+.opt .amt{margin-left:auto}
+.opt[aria-pressed="true"]{border-color:#7db7ea;background:var(--ice);box-shadow:0 0 0 1px #7db7ea inset}
+.opt[aria-pressed="true"] .dot{border-color:var(--navy);background:var(--navy);box-shadow:inset 0 0 0 3px var(--white)}
+.hint{font-size:.85rem;color:var(--muted);margin:6px 0 0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.full{grid-column:1/-1}
+input[type=text],input[type=email]{width:100%;font:500 1rem var(--body);color:var(--navy);padding:12px 14px;border-radius:10px;border:1px solid #cad6e0;background:var(--white)}
+@media (max-width:520px){.opts,.fields{grid-template-columns:1fr}}
+.agree{display:flex;gap:10px;align-items:flex-start;margin-top:14px;background:var(--yellow-soft);border:1px solid var(--yellow-line);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.agree input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--navy)}
+.agree a{color:var(--navy);font-weight:800}
+.err{color:var(--bad);font-weight:700;font-size:.92rem;margin:10px 0 0;min-height:1px}
+.trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.rows{margin:0}
+.rows div{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.rows dt{color:var(--muted)} .rows dd{margin:0;font-weight:800;text-align:right;overflow-wrap:anywhere}
+.total{display:flex;justify-content:space-between;font-family:var(--display);font-weight:800;font-size:1.35rem;padding:12px 0}
+.note{display:flex;gap:10px;background:var(--ice);border:1px solid var(--open-line);border-radius:14px;padding:12px 14px;font-size:.92rem}
+
+.done{text-align:center}
+.badge{display:inline-block;border-radius:99px;padding:4px 12px;font-weight:800;font-size:.8rem;background:var(--yellow-soft);color:#7a5a00;border:1px solid var(--yellow-line)}
+.done h2{font-size:1.9rem;margin:10px 0 6px}
+.ref{display:inline-block;font-family:var(--display);font-weight:800;font-size:1.7rem;letter-spacing:.05em;background:var(--yellow-soft);border:1px solid var(--yellow-line);border-radius:12px;padding:6px 18px;margin:12px 0 6px}
+.done .actions{justify-content:center}
+.other{display:block;margin-top:12px;font-size:.9rem;color:var(--navy);font-weight:700}
+
+.side{display:grid;gap:14px}
+.rates{background:#e8f3fc;border:1px solid var(--open-line);border-radius:20px;padding:18px 20px}
+.rates h3{font-size:1.4rem;margin-bottom:6px}
+.rate{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #b8cfe2}
+.rate:last-of-type{border-bottom:0}
+.rate b{font-family:var(--display);font-size:1.7rem}
+.rate span{font-weight:800} .rate small{display:block;font-weight:500;font-size:.8rem;color:var(--muted)}
+.how{background:var(--yellow-soft);border:1px solid var(--yellow-line);border-radius:16px;padding:14px 16px;font-size:.92rem}
+.how ol{margin:6px 0 0;padding-left:20px}
+.how li{margin:3px 0}
+
+.loading{padding:40px 0;text-align:center;color:var(--muted);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:var(--navy);color:var(--white);padding:10px 16px;border-radius:12px;font-weight:800;z-index:9}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.day.open{transition:transform .12s}.day.open:hover{transform:translateY(-1px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="https://pinchbeckpta.membershiptoolkit.com/assets/01219/a48ca46f550a1728a6060426aed35afe.jpg" alt="The Rays Spirit Rock painted white with blue stars and the words Rent the Rock">
+    <div>
+      <h1>Reserve the <span>Spirit Rock!</span></h1>
+      <p>Celebrate a birthday, cheer on a big win, or thank a favorite teacher.</p>
+    </div>
+  </header>
+
+  <ol class="steps" id="steps" aria-label="Booking steps">
+    <li data-s="1"><span class="n">1</span><span class="t">Choose a date</span></li><li class="bar" aria-hidden="true"></li>
+    <li data-s="2"><span class="n">2</span><span class="t">Your details</span></li><li class="bar" aria-hidden="true"></li>
+    <li data-s="3"><span class="n">3</span><span class="t">Review</span></li><li class="bar" aria-hidden="true"></li>
+    <li data-s="4"><span class="n">4</span><span class="t">Pay</span></li>
+  </ol>
+
+  <div class="layout">
+    <main>
+      <div id="loading" class="card loading">Loading the calendar…</div>
+
+      <!-- 1. date -->
+      <section id="s1" hidden>
+        <h2 class="sec-title">Choose your date</h2>
+        <p class="intro">One family per day. Dates are first come, first served.</p>
+        <div class="card">
+          <div class="calhead">
+            <h3 id="mlabel"></h3>
+            <button class="arrow" id="prev" aria-label="Previous month">‹</button>
+            <button class="arrow" id="next" aria-label="Next month">›</button>
+          </div>
+          <div class="grid" id="dows"></div>
+          <div class="grid" id="days" style="margin-top:4px"></div>
+          <div class="legend">
+            <span><i style="background:var(--sky);border-color:var(--open-line)"></i>Available</span>
+            <span><i style="background:var(--yellow);border-color:var(--yellow-dark)"></i>Selected</span>
+            <span><i style="background:var(--booked)"></i>Booked</span>
+            <span><i style="background:var(--tile)"></i>Unavailable</span>
+          </div>
+          <div class="foot">
+            <div id="picked"><small>Select an available date to continue.</small></div>
+            <button class="btn btn-y" id="go2" disabled>Continue →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. details -->
+      <section id="s2" hidden>
+        <h2 class="sec-title">Your details</h2>
+        <p class="intro">We'll email your booking number and payment link.</p>
+        <div class="card">
+          <div class="chipdate"><span class="d-date"></span><button class="chg" type="button">Change date</button></div>
+          <label>Which rate applies to you?</label>
+          <div class="opts">
+            <button class="opt" type="button" id="opt-member" aria-pressed="true"><span class="dot"></span>PTA member<span class="amt" id="o-member"></span></button>
+            <button class="opt" type="button" id="opt-community" aria-pressed="false"><span class="dot"></span>Non-member<span class="amt" id="o-community"></span></button>
+          </div>
+          <p class="hint">Membership is checked when you pay in Membership Toolkit.</p>
+          <div class="fields">
+            <div><label for="f-name">Contact name</label><input type="text" id="f-name" autocomplete="name" maxlength="80"></div>
+            <div><label for="f-email">Email address</label><input type="email" id="f-email" autocomplete="email" maxlength="120"></div>
+            <div class="full"><label for="f-occ">Occasion <small>(optional)</small></label><input type="text" id="f-occ" maxlength="140" placeholder="For example, a birthday or a thank-you"></div>
+          </div>
+          <div class="trap" aria-hidden="true"><label for="f-website">Leave blank</label><input type="text" id="f-website" tabindex="-1" autocomplete="off"></div>
+          <label class="agree" for="f-agree"><input type="checkbox" id="f-agree"><span id="guidelines"></span></label>
+          <p class="err" id="err2" role="alert"></p>
+          <div class="actions">
+            <button class="btn btn-w" id="back1" type="button">← Back</button>
+            <button class="btn btn-y" id="go3" type="button">Review →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. review -->
+      <section id="s3" hidden>
+        <h2 class="sec-title">Review your request</h2>
+        <p class="intro">Check everything, then request your date.</p>
+        <div class="card">
+          <div class="chipdate"><span class="d-date"></span><button class="chg" type="button">Change date</button></div>
+          <dl class="rows" id="rows"></dl>
+          <div class="total"><span>Total</span><span id="r-total"></span></div>
+          <div class="note"><span aria-hidden="true">ⓘ</span><span id="r-note"></span></div>
+          <p class="err" id="err3" role="alert"></p>
+          <div class="actions">
+            <button class="btn btn-w" id="back2" type="button">← Edit details</button>
+            <button class="btn btn-y" id="submit" type="button">Request this date →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. done -->
+      <section id="s4" hidden>
+        <div class="card done">
+          <span class="badge">Pending payment</span>
+          <h2>Request received!</h2>
+          <p class="muted" id="c-line" style="margin:0"></p>
+          <div class="ref" id="c-ref"></div>
+          <p class="muted" style="margin:0">Pay now to lock in your date. Enter this booking number at checkout.</p>
+          <div class="actions">
+            <a class="btn btn-y" id="paynow" href="#" target="_blank" rel="noopener">Pay now in Membership Toolkit →</a>
+            <button class="btn btn-w" id="copy" type="button">Copy booking number</button>
+          </div>
+          <a class="other" id="other" href="#" target="_blank" rel="noopener" hidden>Not a PTA member? Pay the non-member rate here.</a>
+          <p class="muted" style="font-size:.85rem;margin:14px 0 0">We also emailed you this link. <button class="btn-link" id="again" type="button" style="background:none;border:0;color:var(--navy);font-weight:800;text-decoration:underline;padding:0;font-size:inherit">Request another date</button></p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <div class="rates">
+        <h3>Daily rates</h3>
+        <div class="rate"><span>PTA member<small>Members-only checkout</small></span><b id="s-member"></b></div>
+        <div class="rate"><span>Non-member<small>Open to the community</small></span><b id="s-community"></b></div>
+      </div>
+      <div class="how">
+        <b>How it works</b>
+        <ol>
+          <li>Request an open date here.</li>
+          <li>Tap <b>Pay now</b> and pay in Membership Toolkit with your booking number.</li>
+          <li>The PTA confirms by email. Unpaid requests reopen after <span id="hold">48</span> hours.</li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { cal: null, view: null, sel: null, rate: 'member', step: 1, result: null, busy: false };
+  var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function key(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function fromKey(k) { var p = k.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function nice(k) { return fromKey(k).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }); }
+  function money(n) { return '$' + Number(n).toFixed(0); }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function toast(t) { var el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { el.hidden = true; }, 2600); }
+  function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+  // Talks to the Apps Script web app. Sent as plain text so the browser doesn't block it,
+  // and without cookies, so a parent's Google sign-ins never get involved.
+  function api(fn, arg) {
+    var req = fn === 'getCalendar'
+      ? fetch(BOOKING_API + '?api=calendar', { credentials: 'omit', cache: 'no-store' })
+      : fetch(BOOKING_API, {
+          method: 'POST', credentials: 'omit',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ api: 'request', form: arg })
+        });
+    return req.then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  function load() {
+    return api('getCalendar').then(function (cal) {
+      S.cal = cal;
+      if (!S.view) { var s = fromKey(cal.start); S.view = new Date(s.getFullYear(), s.getMonth(), 1); }
+      if (S.sel && cal.unavailable[S.sel]) S.sel = null;
+      $('o-member').textContent = $('s-member').textContent = money(cal.rates.member);
+      $('o-community').textContent = $('s-community').textContent = money(cal.rates.community);
+      $('hold').textContent = cal.holdHours;
+      var g = esc(cal.guidelines || 'I agree to the Spirit Rock guidelines.');
+      if (cal.guidelinesUrl) g += ' <a href="' + esc(cal.guidelinesUrl) + '" target="_blank" rel="noopener">Read the full guidelines</a>';
+      $('guidelines').innerHTML = '<b>I agree:</b> ' + g;
+      $('loading').hidden = true;
+      renderCal(); show(S.step);
+    }).catch(function () {
+      $('loading').textContent = 'The calendar could not load. Please refresh the page.';
+    });
+  }
+
+  function status(k) {
+    var c = S.cal;
+    if (k < c.start || k > c.end) return 'closed';
+    var u = c.unavailable[k];
+    return u === 'booked' ? 'booked' : u ? 'closed' : 'open';
+  }
+
+  DOW.forEach(function (d) { var e = document.createElement('div'); e.className = 'dow'; e.textContent = d; $('dows').appendChild(e); });
+
+  function renderCal() {
+    var v = S.view, box = $('days');
+    $('mlabel').textContent = v.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    box.innerHTML = '';
+    for (var i = 0; i < v.getDay(); i++) { var b0 = document.createElement('div'); b0.className = 'day blank'; box.appendChild(b0); }
+    var dim = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate();
+    for (var n = 1; n <= dim; n++) {
+      var k = key(new Date(v.getFullYear(), v.getMonth(), n)), st = status(k);
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = n; b.dataset.day = k;
+      b.className = 'day' + (st === 'open' ? ' open' : st === 'booked' ? ' booked' : '') + (S.sel === k ? ' sel' : '');
+      b.setAttribute('aria-label', nice(k) + ', ' + (st === 'open' ? 'available' : st === 'booked' ? 'booked' : 'unavailable'));
+      if (st !== 'open') b.disabled = true;
+      box.appendChild(b);
+    }
+    var s = fromKey(S.cal.start), e = fromKey(S.cal.end);
+    $('prev').disabled = v <= new Date(s.getFullYear(), s.getMonth(), 1);
+    $('next').disabled = v >= new Date(e.getFullYear(), e.getMonth(), 1);
+    $('go2').disabled = !S.sel;
+    $('picked').innerHTML = S.sel ? '<small>Selected date</small><b>' + esc(nice(S.sel)) + '</b>' : '<small>Select an available date to continue.</small>';
+  }
+
+  function show(n) {
+    S.step = n;
+    ['s1', 's2', 's3', 's4'].forEach(function (id, i) { $(id).hidden = (i + 1 !== n) || !S.cal; });
+    Array.prototype.forEach.call(document.querySelectorAll('#steps li[data-s]'), function (li) {
+      var s = +li.dataset.s;
+      li.className = s === n ? 'on' : s < n ? 'done' : '';
+      li.querySelector('.n').textContent = s < n ? '✓' : s;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.d-date'), function (e) { e.textContent = S.sel ? nice(S.sel) : ''; });
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+
+  function setRate(r) {
+    S.rate = r;
+    $('opt-member').setAttribute('aria-pressed', r === 'member');
+    $('opt-community').setAttribute('aria-pressed', r === 'community');
+  }
+
+  document.addEventListener('click', function (e) {
+    var d = e.target.closest('[data-day]');
+    if (d && !d.disabled) { S.sel = d.dataset.day; renderCal(); }
+  });
+  $('prev').onclick = function () { S.view = new Date(S.view.getFullYear(), S.view.getMonth() - 1, 1); renderCal(); };
+  $('next').onclick = function () { S.view = new Date(S.view.getFullYear(), S.view.getMonth() + 1, 1); renderCal(); };
+  $('go2').onclick = function () { if (S.sel) show(2); };
+  Array.prototype.forEach.call(document.querySelectorAll('.chg'), function (b) { b.onclick = function () { show(1); }; });
+  $('back1').onclick = function () { show(1); };
+  $('back2').onclick = function () { show(2); };
+  $('opt-member').onclick = function () { setRate('member'); };
+  $('opt-community').onclick = function () { setRate('community'); };
+
+  $('go3').onclick = function () {
+    var name = $('f-name').value.trim(), email = $('f-email').value.trim();
+    if (!name || !validEmail(email)) { $('err2').textContent = 'Add a contact name and a valid email address.'; return; }
+    if (!$('f-agree').checked) { $('err2').textContent = 'Please check the box to agree to the guidelines.'; return; }
+    $('err2').textContent = '';
+    var amt = S.cal.rates[S.rate];
+    var rows = [['Contact', name], ['Email', email], ['Occasion', $('f-occ').value.trim() || '—'], ['Rate', S.rate === 'member' ? 'PTA member' : 'Non-member']];
+    $('rows').innerHTML = rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join('');
+    $('r-total').textContent = money(amt);
+    $('r-note').textContent = 'Nothing is charged here. Next you’ll pay ' + money(amt) + ' in Membership Toolkit. We hold your date for ' + S.cal.holdHours + ' hours.';
+    $('err3').textContent = '';
+    show(3);
+  };
+
+  $('submit').onclick = function () {
+    if (S.busy) return;
+    S.busy = true;
+    var btn = $('submit'); btn.disabled = true; btn.textContent = 'Saving…';
+    api('requestDate', {
+      day: S.sel, rate: S.rate, name: $('f-name').value, email: $('f-email').value,
+      occasion: $('f-occ').value, agree: $('f-agree').checked, website: $('f-website').value
+    }).then(function (r) {
+      if (!r || !r.ok) {
+        $('err3').textContent = (r && r.error) || 'Something went wrong. Please try again.';
+        if (r && r.taken) { S.sel = null; return load().then(function () { show(1); toast('That date was just taken. Please pick another.'); }); }
+        return;
+      }
+      S.result = r;
+      $('c-line').innerHTML = 'We’re holding <b>' + esc(nice(r.day)) + '</b> until ' + esc(r.holdUntil) + '.';
+      $('c-ref').textContent = r.ref;
+      var pay = $('paynow');
+      if (r.payUrl) { pay.href = r.payUrl; pay.textContent = 'Pay ' + money(r.amount) + ' now in Membership Toolkit →'; pay.hidden = false; }
+      else pay.hidden = true;
+      $('other').hidden = !r.otherPayUrl; if (r.otherPayUrl) $('other').href = r.otherPayUrl;
+      show(4);
+    }).catch(function () {
+      $('err3').textContent = 'We couldn’t save your request. Please check your connection and try again.';
+    }).then(function () { S.busy = false; btn.disabled = false; btn.textContent = 'Request this date →'; });
+  };
+
+  $('copy').onclick = function () {
+    var ref = S.result && S.result.ref; if (!ref) return;
+    try {
+      navigator.clipboard.writeText(ref).then(function () { toast('Copied ' + ref); }, function () { toast('Your booking number is ' + ref); });
+    } catch (e) { toast('Your booking number is ' + ref); }
+  };
+
+  $('again').onclick = function () {
+    S.sel = null; S.result = null; $('f-agree').checked = false; $('f-occ').value = '';
+    load().then(function () { show(1); });
+  };
+
+  load();
+})();
+</script>
+</body>
+</html>
